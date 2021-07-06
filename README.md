@@ -22,7 +22,7 @@ See what proportion of Sushi pool tokens you deposited and what proportions you 
 }
 ```
 
-You need `ETH_ADDRESS` and `WEB3_INFURA_PROJECT_ID` in your env. Run like:
+You need `ETH_ADDRESS` (the address you want to check the IL for) and `WEB3_INFURA_PROJECT_ID` in your env. Run like:
 
 ```
 ETH_ADDRESS=0x92ac69308B8794ecECFfa804278b252DC77982C0 node go.js
