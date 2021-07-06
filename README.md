@@ -32,5 +32,6 @@ That address is just some rando's. Apologies rando.
 
 ### TODO:
 
+- wrap all the calls in try-catch blocks
 - more pools
 - fiat conversions (for the unshriven)
