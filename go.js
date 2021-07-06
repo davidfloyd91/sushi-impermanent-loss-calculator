@@ -1,7 +1,8 @@
 const Web3 = require("web3");
 const colors = require("colors");
 
-const decimals = require("./decimals.js");
+// const decimals = require("./decimals.js");
+
 const pairs = require("./pairs.js");
 const tokenAddresses = require("./tokenAddresses.js");
 
@@ -72,9 +73,9 @@ const go = async () => {
     for (const item of mintEvents) {
       const percentDone = (currentEvent / lastEventIndex) * 100;
 
-      if (currentEvent % 5 === 0) {
+      if (currentEvent % 7 === 0) {
         const colorIndex =
-          currentEvent === 0 ? 0 : (currentEvent / 5) % colorFuncs.length;
+          currentEvent === 0 ? 0 : (currentEvent / 7) % colorFuncs.length;
         const colorFunc = colorFuncs[colorIndex];
         const formattedPercentDone = `${percentDone.toFixed(2)}%`;
         console.log(`${colorFunc(formattedPercentDone)}`);
@@ -88,8 +89,19 @@ const go = async () => {
       if (from === ETH_ADDRESS) {
         userHasPosition = true;
         const { amount0: _amount0, amount1: _amount1 } = returnValues || {};
-        mintAmount0 = parseInt(_amount0, 10);
-        mintAmount1 = parseInt(_amount1, 10);
+
+        const mintAmount0Before = mintAmount0;
+        const mintAmount1Before = mintAmount1;
+
+        mintAmount0 += parseInt(_amount0, 10);
+        mintAmount1 += parseInt(_amount1, 10);
+
+        console.log({
+          mintAmount0Before,
+          mintAmount1Before,
+          mintAmount0After: mintAmount0,
+          mintAmount1After: mintAmount1,
+        });
       }
 
       currentEvent++;

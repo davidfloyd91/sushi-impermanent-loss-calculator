@@ -1,7 +1,7 @@
 const Web3 = require("web3");
 const fs = require("fs");
 
-const tokenList = require("../uniswapDefaultTokenList.js");
+const tokenList = require("../tokenList.js");
 const uniswapV2FactoryAbi = require("../abis/uniswapV2Factory.js");
 
 const { WEB3_INFURA_PROJECT_ID } = process.env;
