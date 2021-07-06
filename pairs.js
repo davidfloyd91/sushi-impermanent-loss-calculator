@@ -1,0 +1,12 @@
+module.exports = [
+  {
+    tokenA: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    tokenB: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    pair: "0xCEfF51756c56CeFFCA006cD410B03FFC46dd3a58",
+  },
+  // {
+  //   tokenA: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+  //   tokenB: "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF",
+  //   pair: "0xC3f279090a47e80990Fe3a9c30d24Cb117EF91a8",
+  // },
+];
