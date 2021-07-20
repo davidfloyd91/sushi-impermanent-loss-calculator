@@ -1,6 +1,6 @@
 # Sushi impermanent loss calculator
 
-... is a work in progress. Meaning, the title's a bit of an exaggeration: it only supports the WETH-WBTC pool for now.
+... is a work in progress. Meaning, the title's a bit of an exaggeration: it only supports the WETH-WBTC pool for now. And it doesn't yet account for liquidity withdrawals.
 
 See what proportion of Sushi pool tokens you deposited and what proportions you would get if you withdrew rn, eg:
 
@@ -32,6 +32,8 @@ That address is just some rando's. Apologies rando.
 
 ### TODO:
 
+- account for burn events
+- account for slp staking
 - wrap all the calls in try-catch blocks
 - more pools
 - fiat conversions (for the unshriven)

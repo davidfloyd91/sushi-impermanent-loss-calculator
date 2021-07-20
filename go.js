@@ -70,6 +70,8 @@ const go = async () => {
     const lastEventIndex = mintEvents.length - 1;
     let currentEvent = 0;
 
+    console.log(colors.white("=== SCANNING FOR MINTS ==="));
+
     for (const item of mintEvents) {
       const percentDone = (currentEvent / lastEventIndex) * 100;
 
@@ -107,71 +109,116 @@ const go = async () => {
       currentEvent++;
     }
 
-    if (userHasPosition) {
-      const _liquidityBalance = await pairContract.methods
-        .balanceOf(ETH_ADDRESS)
-        .call();
-      liquidityBalance = parseInt(_liquidityBalance, 10);
-
-      const _balance0 = await tokenAContract.methods
-        .balanceOf(pairAddress)
-        .call();
-      balance0 = parseInt(_balance0, 10);
-
-      const _balance1 = await tokenBContract.methods
-        .balanceOf(pairAddress)
-        .call();
-      balance1 = parseInt(_balance1, 10);
-
-      const _totalSupply = await pairContract.methods.totalSupply().call();
-      totalSupply = parseInt(_totalSupply, 10);
-
-      // const amount0Decimals = decimals[tokenA];
-      // const amount1Decimals = decimals[tokenB];
-
-      amount0 =
-        totalSupply > 0 ? (liquidityBalance * balance0) / totalSupply : 0;
-
-      amount1 =
-        totalSupply > 0 ? (liquidityBalance * balance1) / totalSupply : 0;
-
-      const tokenASymbol =
-        (tokenAddresses[tokenA] && tokenAddresses[tokenA].symbol) || tokenA;
-      const tokenBSymbol =
-        (tokenAddresses[tokenB] && tokenAddresses[tokenB].symbol) || tokenB;
-
-      const amount0Change = amount0 - mintAmount0;
-
-      const amount0PercentChange = (amount0Change / mintAmount0) * 100;
-      const formattedAmount0PercentChange = `${amount0PercentChange.toFixed(
-        2
-      )}%`;
-
-      const amount1Change = amount1 - mintAmount1;
-
-      const amount1PercentChange = (amount1Change / mintAmount1) * 100;
-      const formattedAmount1PercentChange = `${amount1PercentChange.toFixed(
-        2
-      )}%`;
-
-      const theDeal = {
-        [tokenASymbol]: {
-          initialAmount: mintAmount0,
-          currentAmount: amount0,
-          change: amount0Change,
-          percentChange: formattedAmount0PercentChange,
-        },
-        [tokenBSymbol]: {
-          initialAmount: mintAmount1,
-          currentAmount: amount1,
-          change: amount1Change,
-          percentChange: formattedAmount1PercentChange,
-        },
-        liquidityBalance,
-      };
-
-      console.log(theDeal);
+    if (!userHasPosition) {
+      console.log("no slp mint events found");
+      return;
     }
+
+    const burnEvents =
+      (await pairContract.getPastEvents("Burn", {
+        fromBlock: currentBlockNumber - BLOCKS_TO_CHECK,
+      })) || [];
+
+    const lastBurnEventIndex = burnEvents.length - 1;
+    let currentBurnEvent = 0;
+
+    console.log(colors.white("=== SCANNING FOR BURNS ==="));
+
+    for (const item of burnEvents) {
+      const percentDone = (currentBurnEvent / lastBurnEventIndex) * 100;
+
+      if (currentBurnEvent % 7 === 0) {
+        const colorIndex =
+          currentBurnEvent === 0
+            ? 0
+            : (currentBurnEvent / 7) % colorFuncs.length;
+        const colorFunc = colorFuncs[colorIndex];
+        const formattedPercentDone = `${percentDone.toFixed(2)}%`;
+        console.log(`${colorFunc(formattedPercentDone)}`);
+      }
+
+      const { returnValues, transactionHash } = item || {};
+
+      const transaction = await getTransaction(transactionHash);
+      const { from } = transaction || {};
+
+      if (from === ETH_ADDRESS) {
+        const { amount0: _amount0, amount1: _amount1 } = returnValues || {};
+
+        const burnAmount0 = parseInt(_amount0, 10);
+        const burnAmount1 = parseInt(_amount1, 10);
+
+        mintAmount0 -= burnAmount0;
+        mintAmount1 -= burnAmount1;
+
+        console.log({
+          burnAmount0,
+          burnAmount1,
+          mintAmount0After: mintAmount0,
+          mintAmount1After: mintAmount1,
+        });
+      }
+
+      currentBurnEvent++;
+    }
+
+    const _liquidityBalance = await pairContract.methods
+      .balanceOf(ETH_ADDRESS)
+      .call();
+    liquidityBalance = parseInt(_liquidityBalance, 10);
+
+    const _balance0 = await tokenAContract.methods
+      .balanceOf(pairAddress)
+      .call();
+    balance0 = parseInt(_balance0, 10);
+
+    const _balance1 = await tokenBContract.methods
+      .balanceOf(pairAddress)
+      .call();
+    balance1 = parseInt(_balance1, 10);
+
+    const _totalSupply = await pairContract.methods.totalSupply().call();
+    totalSupply = parseInt(_totalSupply, 10);
+
+    // const amount0Decimals = decimals[tokenA];
+    // const amount1Decimals = decimals[tokenB];
+
+    amount0 = totalSupply > 0 ? (liquidityBalance * balance0) / totalSupply : 0;
+
+    amount1 = totalSupply > 0 ? (liquidityBalance * balance1) / totalSupply : 0;
+
+    const tokenASymbol =
+      (tokenAddresses[tokenA] && tokenAddresses[tokenA].symbol) || tokenA;
+    const tokenBSymbol =
+      (tokenAddresses[tokenB] && tokenAddresses[tokenB].symbol) || tokenB;
+
+    const amount0Change = amount0 - mintAmount0;
+
+    const amount0PercentChange = (amount0Change / mintAmount0) * 100;
+    const formattedAmount0PercentChange = `${amount0PercentChange.toFixed(2)}%`;
+
+    const amount1Change = amount1 - mintAmount1;
+
+    const amount1PercentChange = (amount1Change / mintAmount1) * 100;
+    const formattedAmount1PercentChange = `${amount1PercentChange.toFixed(2)}%`;
+
+    const theDeal = {
+      [tokenASymbol]: {
+        initialAmount: mintAmount0,
+        currentAmount: amount0,
+        change: amount0Change,
+        percentChange: formattedAmount0PercentChange,
+      },
+      [tokenBSymbol]: {
+        initialAmount: mintAmount1,
+        currentAmount: amount1,
+        change: amount1Change,
+        percentChange: formattedAmount1PercentChange,
+      },
+      liquidityBalance,
+    };
+
+    console.log(theDeal);
   }
 };
 
